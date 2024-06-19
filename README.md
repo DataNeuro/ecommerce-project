@@ -9,6 +9,7 @@ https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
 ![Data Model](https://github.com/DataNeuro/ecommerce-project/blob/main/E-commerce_Data%20model.jpg)
 
 
+Python was used to create a database with the following tables: Aisle, Departments, Products, Orders, and Order_products. After setting up the structure, data was loaded into these tables to organize and manage the information efficiently.(https://github.com/DataNeuro/ecommerce-project/blob/main/ecommerce_project_final.ipynb)
 
 The project involved analysing various aspects of this data. Firstly, a list of departments and their associated aisles was identified and the number of aisles in each department was determined. The next step was to create a list of products with their associated aisles and determine the number of products in each aisle.
 
