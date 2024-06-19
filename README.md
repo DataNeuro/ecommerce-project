@@ -1,6 +1,5 @@
 # E-commerce Project
-## Introduction
-### 
+### Overview
 The project involved analyzing an extensive dataset containing information about grocery orders placed by Instacart users. 
 ### Dataset Used
 The dataset contains a sample of over 3 million grocery orders from over 200,000 Instacart users. For each user, between 4 and 100 orders are available, along with a list of products purchased in each order. In addition, information is provided on the week and time of day the order was placed, as well as the relative time between orders.
