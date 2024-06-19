@@ -2,8 +2,10 @@
 ## Introduction
 ### 
 The project involved analyzing an extensive dataset containing information about grocery orders placed by Instacart users. 
-### 
-Dataset Used: https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
+### Dataset Used
+The dataset contains a sample of over 3 million grocery orders from over 200,000 Instacart users. For each user, between 4 and 100 orders are available, along with a list of products purchased in each order. In addition, information is provided on the week and time of day the order was placed, as well as the relative time between orders.
+
+https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
 
 The project involved analysing various aspects of this data. Firstly, a list of departments and their associated aisles was identified and the number of aisles in each department was determined. The next step was to create a list of products with their associated aisles and determine the number of products in each aisle.
 
