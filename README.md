@@ -1,7 +1,9 @@
 # E-commerce Project
 ## Introduction
-### The project involved analyzing an extensive dataset containing information about grocery orders placed by Instacart users. 
-### Data source: https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
+### 
+The project involved analyzing an extensive dataset containing information about grocery orders placed by Instacart users. 
+### 
+Dataset Used: https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
 
 ### The project involved analysing various aspects of this data. Firstly, a list of departments and their associated aisles was identified and the number of aisles in each department was determined. The next step was to create a list of products with their associated aisles and determine the number of products in each aisle.
 
