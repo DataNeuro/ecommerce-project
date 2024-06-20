@@ -9,10 +9,10 @@ https://www.kaggle.com/competitions/instacart-market-basket-analysis/data
 ![Data Model](https://github.com/DataNeuro/ecommerce-project/blob/main/E-commerce_Data%20model.jpg)
 
 
-Python was used to create a database with the following tables: Aisle, Departments, Products, Orders, and Order_products. After setting up the structure, data was loaded into these tables to organize and manage the information efficiently.(https://github.com/DataNeuro/ecommerce-project/blob/main/ecommerce_project_final.ipynb)
+Python was used to create a database with the following tables: Aisle, Departments, Products, Orders, and Order_products. After setting up the structure, data was loaded into these tables to organize and manage the information efficiently(https://github.com/DataNeuro/ecommerce-project/blob/main/ecommerce_project_final.ipynb).
 
 ### Project Overview
-The project involved analysing various aspects of this data. Firstly, a list of departments and their associated aisles was identified and the number of aisles in each department was determined. The next step was to create a list of products with their associated aisles and determine the number of products in each aisle.
+The project involved analysing data. Firstly, a list of departments and their associated aisles was identified and the number of aisles in each department was determined. The next step was to create a list of products with their associated aisles and determine the number of products in each aisle.
 
 The analysis also included identifying the users who placed the highest number of orders. Based on this, a discount system was proposed: users with the highest number of orders (first group) receive a 15% discount, the second group 10%, the third group 5% and the remaining users receive no discount.
 
