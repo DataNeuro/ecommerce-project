@@ -59,58 +59,8 @@ CASE
 	END AS discount
 FROM ranking_orders;
 
---7. List of the 10 most purchased products.
-SELECT product_id, product_name FROM products
-WHERE product_id IN
-(SELECT product_id FROM order_products
-GROUP BY product_id
-ORDER BY SUM(add_to_cart_order) DESC
-LIMIT 10);
-
---8. The three most reordered products.
-WITH reordered_products AS
-	(SELECT product_id, SUM(reordered) AS number_reordered_products FROM order_products
-	GROUP BY product_id)
-
-SELECT rp.product_id, p.product_name, rp.number_reordered_products FROM reordered_products rp
-JOIN products p
-ON rp.product_id=p.product_id
-ORDER BY rp.number_reordered_products DESC
-LIMIT 3;
-
---9. Ranking of the 10 products with the highest sales.
-CREATE TEMPORARY TABLE number_of_orders AS
-	SELECT product_id, COUNT(order_id) AS sum_of_orders FROM order_products
-	GROUP BY product_id;
-
-SELECT no.product_id, p.product_name, no.sum_of_orders, DENSE_RANK() OVER(ORDER BY no.sum_of_orders DESC) AS rankig 
-FROM number_of_orders no
-JOIN products p
-ON no.product_id=p.product_id
-LIMIT 10;
-
---10. Number of orders per hour.
-CREATE TEMPORARY TABLE number_orders_per_hour AS 
-SELECT order_hour_of_day, COUNT(order_id) AS number_orders FROM orders
-GROUP BY order_hour_of_day;
-
-SELECT * FROM number_orders_per_hour;
-
---11. Which hour had the most orders and which the least.
-SELECT order_hour_of_day, number_orders FROM number_orders_per_hour
-WHERE number_orders IN (SELECT MAX(number_orders)FROM number_orders_per_hour)
-UNION ALL 
-SELECT order_hour_of_day, number_orders FROM number_orders_per_hour
-WHERE number_orders IN (SELECT MIN(number_orders)FROM number_orders_per_hour);
-
---12. 10 orders with the highest number of products.
-SELECT order_id, SUM(add_to_cart_order) AS number_order_products FROM order_products
-GROUP BY order_id
-ORDER BY number_order_products DESC
-LIMIT 10;
-
---13. Information about each order, including the products that were purchased and their department
---and aisle information.
+--7. Prepare a table for further analysis containing information on each order, 
+-- including the products purchased and their department and aisle information.
 CREATE TEMPORARY TABLE order_info AS
 SELECT o.order_id, o.user_id, o.order_number, o.order_dow, o.order_hour_of_day, o.days_since_prior_order,
 op.product_id, op.add_to_cart_order, op.reordered,
@@ -119,50 +69,15 @@ FROM orders o
 JOIN order_products op ON o.order_id=op.order_id
 JOIN products p ON op.product_id=p.product_id;
 
-SELECT * FROM order_info;
-
---14. The average amount of a specific product placed in a shopping cart.
-SELECT product_id, product_name, ROUND(AVG(add_to_cart_order),2) AS avg_add_to_cart FROM order_info
-GROUP BY product_id, product_name
-ORDER BY product_id;
-
---15. The amount of products sold by department.
+--8. The amount of products sold by department.
 SELECT o.department_id, d.department, SUM(o.add_to_cart_order) AS sell_by_department FROM order_info o
 JOIN departments d
 ON o.department_id=d.department_id
 GROUP BY o.department_id, d.department
 ORDER BY o.department_id;
 
---16. List of products that have not been reordered.
-SELECT product_id, product_name FROM order_info
-GROUP BY product_id, product_name
-HAVING SUM(reordered) = 0;
-
---17. List of the 10 most frequently purchased products in the morning.
-SELECT product_id, product_name, COUNT(product_id) AS number_products FROM order_info
-GROUP BY product_id, product_name, order_hour_of_day
-HAVING order_hour_of_day IN(6,7,8,9)
-ORDER BY number_products DESC
-LIMIT 10;
-
---18. The number of orders product compared to the number of reorders product,
---together with the average quantity of product added to the basket.
-CREATE TEMPORARY TABLE product_order_summary AS
-	SELECT product_id, product_name, count(*) AS total_orders,
-	SUM(reordered) AS total_reorders, AVG(add_to_cart_order) AS avg_add_to_cart
-	FROM order_info
-	GROUP BY product_id, product_name;
-
-SELECT * FROM product_order_summary
-ORDER BY product_id ASC, total_orders DESC;
-
---19. What percentage of all products ordered were orders of the product with the highest sales?
-SELECT ROUND((SELECT total_orders FROM product_order_summary 
-			  WHERE product_id IN(SELECT product_id FROM order_info GROUP BY product_id ORDER BY SUM(add_to_cart_order) DESC LIMIT 1 ))/SUM(total_orders)*100,2)
-FROM product_order_summary;
-
---20. Groups the orders by department and finds the total number of products purchased,
---the total number of products purchased on weekdays vs weekends.
+--9. Prepare a table for further analysis: by department with the total number of products purchased, 
+--the total number of products purchased on weekdays and weekends.
 CREATE TEMPORARY TABLE department_order_summary AS
 	SELECT department_id, COUNT(*) AS total_products_purchased,
 	COUNT(CASE WHEN order_dow < 6 THEN 1 ELSE NULL END) AS total_weekday_purchases,
@@ -170,18 +85,11 @@ CREATE TEMPORARY TABLE department_order_summary AS
 	FROM order_info
 	GROUP BY department_id;
 
-SELECT * FROM department_order_summary;
-
--- 21. The difference between weekday and weekend sales in each department.
-SELECT department_id, (total_weekday_purchases-total_weekend_purchases) AS difference_in_sales 
-FROM department_order_summary
-ORDER BY department_id;
-
---22. Which department had the highest weekly sales?
+--10. Which department had the highest weekly sales?
 SELECT department_id FROM department_order_summary
-WHERE total_weekday_purchases IN(SELECT MAX(total_weekday_purchases) FROM department_order_summaryy);
+WHERE total_weekday_purchases IN(SELECT MAX(total_weekday_purchases) FROM department_order_summary);
 
---23. The 10 aisles with the highest sales.
+--11. The 10 aisles with the highest sales.
 CREATE TEMPORARY TABLE aisle_order_summary AS
 	SELECT a.aisle_id, a.aisle, COUNT(o.*) total_products_purchased FROM aisles a
 	JOIN order_info o
@@ -192,7 +100,86 @@ SELECT * FROM aisle_order_summary
 ORDER BY total_products_purchased DESC
 LIMIT 10;
 
---24. Summary with information on product, department, aisle, total number of orders, reorders,
+--12. List of the 10 most purchased products.
+SELECT product_id, product_name FROM products
+WHERE product_id IN
+(SELECT product_id FROM order_products
+GROUP BY product_id
+ORDER BY SUM(add_to_cart_order) DESC
+LIMIT 10);
+
+--13. Ranking of the 10 products with the highest number of units sold.
+CREATE TEMPORARY TABLE number_of_order_products AS
+	SELECT product_id, SUM(add_to_cart_order) AS sum_of_order_products FROM order_products
+	GROUP BY product_id;
+
+SELECT no.product_id, p.product_name, no.sum_of_order_products, DENSE_RANK() OVER(ORDER BY no.sum_of_order_products DESC) AS rankig 
+FROM number_of_order_products no
+JOIN products p
+ON no.product_id=p.product_id
+LIMIT 10;
+
+--14. The three most reordered products.
+WITH reordered_products AS
+	(SELECT product_id, SUM(reordered) AS number_reordered_products FROM order_products
+	GROUP BY product_id)
+
+SELECT rp.product_id, p.product_name, rp.number_reordered_products FROM reordered_products rp
+JOIN products p
+ON rp.product_id=p.product_id
+ORDER BY rp.number_reordered_products DESC
+LIMIT 3;
+
+--15. Prepare a table for further analysis with the number of product orders compared to the number of product re-orders, 
+--and with the average amount of product added to the basket.
+CREATE TEMPORARY TABLE product_order_summary AS
+	SELECT product_id, product_name, count(*) AS total_orders,
+	SUM(reordered) AS total_reorders, AVG(add_to_cart_order) AS avg_add_to_cart
+	FROM order_info
+	GROUP BY product_id, product_name;
+
+--16. What percentage of all products ordered were orders of the product with the highest sales?
+SELECT ROUND((SELECT total_orders FROM product_order_summary 
+			  WHERE product_id IN(SELECT product_id FROM order_info GROUP BY product_id ORDER BY SUM(add_to_cart_order) DESC LIMIT 1 ))/SUM(total_orders)*100,2)
+FROM product_order_summary;
+
+--17. Number of orders per hour.
+CREATE TEMPORARY TABLE number_orders_per_hour AS 
+SELECT order_hour_of_day, COUNT(order_id) AS number_orders FROM orders
+GROUP BY order_hour_of_day;
+
+SELECT * FROM number_orders_per_hour;
+
+--18. Which hour had the most orders and which the least.
+SELECT order_hour_of_day, number_orders FROM number_orders_per_hour
+WHERE number_orders IN (SELECT MAX(number_orders)FROM number_orders_per_hour)
+UNION ALL 
+SELECT order_hour_of_day, number_orders FROM number_orders_per_hour
+WHERE number_orders IN (SELECT MIN(number_orders)FROM number_orders_per_hour);
+
+--19. List of the 10 most frequently purchased products in the morning.
+SELECT product_id, product_name, COUNT(product_id) AS number_products FROM order_info
+GROUP BY product_id, product_name, order_hour_of_day
+HAVING order_hour_of_day IN(6,7,8,9)
+ORDER BY number_products DESC
+LIMIT 10;
+
+-- 20. The difference between weekday and weekend sales in each department.
+SELECT department_id, (total_weekday_purchases-total_weekend_purchases) AS difference_in_sales 
+FROM department_order_summary
+ORDER BY department_id;
+
+--21. List of products that have not been reordered.
+SELECT product_id, product_name FROM order_info
+GROUP BY product_id, product_name
+HAVING SUM(reordered) = 0;
+
+--22. The average amount of a specific product placed in a shopping cart.
+SELECT product_id, product_name, ROUND(AVG(add_to_cart_order),2) AS avg_add_to_cart FROM order_info
+GROUP BY product_id, product_name
+ORDER BY product_id;
+
+--23. Summary with information on product, department, aisle, total number of orders, reorders,
 --average number of products added to basket, total sales, weekly and weekend sales.
 CREATE TEMPORARY TABLE product_behavior_analysis AS
     SELECT p.product_id, p.product_name, p.department_id, d.department, p.aisle_id, a.aisle,
@@ -207,7 +194,7 @@ CREATE TEMPORARY TABLE product_behavior_analysis AS
 	
 SELECT * FROM product_behavior_analysis;
 
---25. Comparison of the number of orders of each product with the maximum number of orders in an aisle.
+--24. Comparison of the number of orders of each product with the maximum number of orders in an aisle.
 SELECT product_id, product_name, aisle_id, aisle, total_orders, 
 MAX(total_orders) OVER(PARTITION BY aisle_id)AS highest_orders
 FROM product_behavior_analysis;
