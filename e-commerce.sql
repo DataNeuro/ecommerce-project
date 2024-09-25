@@ -77,7 +77,7 @@ GROUP BY o.department_id, d.department
 ORDER BY o.department_id;
 
 --9. Prepare a table for further analysis: by department with the total number of products purchased, 
---the total number of products purchased on weekdays and weekends.-do poprawy
+--the total number of products purchased on weekdays and weekends.
 CREATE TEMPORARY TABLE department_order_summary AS
 	SELECT department_id, COUNT(*) AS total_products_purchased,
 	COUNT(CASE WHEN order_dow < 6 THEN 1 ELSE NULL END) AS total_weekday_purchases,
