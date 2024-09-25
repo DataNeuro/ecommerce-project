@@ -76,8 +76,8 @@ ON o.department_id=d.department_id
 GROUP BY o.department_id, d.department
 ORDER BY o.department_id;
 
---9. Prepare a table for further analysis: by department with the total number of products purchased, 
---the total number of products purchased on weekdays and weekends.
+--9. Prepare a summary table by department, showing the total number of products purchased 
+--and separate counts for purchases made on weekdays and weekends.
 CREATE TEMPORARY TABLE department_order_summary AS
 	SELECT department_id, COUNT(*) AS total_products_purchased,
 	COUNT(CASE WHEN order_dow < 6 THEN 1 ELSE NULL END) AS total_weekday_purchases,
@@ -166,7 +166,7 @@ GROUP BY order_hour_of_day;
 
 SELECT * FROM number_orders_per_hour;
 
---20. Which hour had the most orders and which the least.
+--20. Which hour had the most orders and which had the least?
 SELECT order_hour_of_day, number_orders FROM number_orders_per_hour
 WHERE number_orders IN (SELECT MAX(number_orders)FROM number_orders_per_hour)
 UNION ALL 
@@ -181,7 +181,7 @@ ORDER BY number_products DESC
 LIMIT 10;
 
 --22. Summary with information on product, department, aisle, total number of orders, reorders,
---average number of products added to basket, total sales, weekly and weekend sales.
+--the average number of products added to the basket, total sales, weekly and weekend sales.
 CREATE TEMPORARY TABLE product_behavior_analysis AS
     SELECT p.product_id, p.product_name, p.department_id, d.department, p.aisle_id, a.aisle,
            pos.total_orders, pos.total_reorders, pos.avg_add_to_cart,
